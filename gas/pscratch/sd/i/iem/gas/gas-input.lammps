@@ -1,0 +1,63 @@
+
+variable T equal 500
+
+units real
+atom_style molecular
+boundary p p p
+pair_style lj/cut 14
+
+bond_style harmonic
+angle_style harmonic
+dihedral_style opls
+improper_style harmonic
+
+special_bonds lj 0.0 0.0 0.5
+
+read_data cnt_molecular.data
+include parm.lammps
+
+group carbon_atoms type 1 # CNT atoms
+
+# move the CNT to the center of the box
+variable carbon_xcm equal -1*xcm(carbon_atoms,x)
+variable carbon_ycm equal -1*xcm(carbon_atoms,y)
+variable carbon_zcm equal -1*xcm(carbon_atoms,z)
+displace_atoms carbon_atoms move ${carbon_xcm} ${carbon_ycm} ${carbon_zcm} 
+
+# move the CNT to the center of the box
+change_box all x final -100 100 y final -100 100 z final -100 100
+
+# create a gas phase
+delete_atoms random fraction 0.04 no carbon_atoms NULL 782793 bond yes
+
+
+variable zmax equal bound(carbon_atoms,zmax) # find the max and min z values of the CNT
+variable zmin equal bound(carbon_atoms,zmin)
+region inside_CNT cylinder z 0 0 2.5 ${zmin} ${zmax} # create a region inside the CNT
+create_atoms 2 random 40 323485 inside_CNT overlap 1.8 maxtry 50 # create 40 gas atoms inside the CNT
+
+
+group CNT type 1
+group gas type 2
+
+reset_atoms id sort yes
+
+minimize 1.0e-4 1.0e-6 100 1000
+reset_timestep 0
+
+# create a velocity for the gas atoms
+velocity all create ${T} 48455 mom yes rot yes
+fix mynve all nve 
+compute tcar carbon_atoms temp # compute the temperature of the CNT
+fix myber1 all temp/berendsen ${T} ${T} 100 # fix the temperature of the CNT
+fix_modify myber1 temp tcar # modify the fix to compute tcar
+compute tgas gas temp # compute the temperature of the gas
+fix myber2 all temp/berendsen ${T} ${T} 100 # fix the temperature of the gas
+fix_modify myber2 temp tgas # modify the fix to compute tgas
+fix myspr carbon_atoms spring/self 5 # fix the CNT atoms to keep the CNT straight
+timestep 1.0 # set the timestep
+
+dump mydmp all atom 1000 dump.lammpstrj
+thermo 1000
+
+run 8000

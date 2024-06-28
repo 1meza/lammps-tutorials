@@ -1,0 +1,165 @@
+LAMMPS (17 Apr 2024)
+OMP_NUM_THREADS environment is not set. Defaulting to 1 thread. (src/comm.cpp:98)
+  using 1 OpenMP thread(s) per MPI task
+units real
+atom_style full
+bond_style harmonic
+angle_style harmonic
+dihedral_style harmonic
+pair_style lj/cut/coul/long 12
+kspace_style pppm 1e-5
+special_bonds lj 0.0 0.0 0.5 coul 0.0 0.0 1.0 angle yes
+
+region box block -45 45 -15 15 -15 15
+create_box 9 box bond/types 7 angle/types 8 dihedral/types 4 extra/bond/per/atom 3 extra/angle/per/atom 6 extra/dihedral/per/atom 10 extra/special/per/atom 14
+Created orthogonal box = (-45 -15 -15) to (45 15 15)
+  1 by 1 by 1 MPI processor grid
+
+include ../PARM.lammps
+# LAMMPS input script by Simon Gravelle
+# This input is part of a tutorial from https://lammpstutorials.github.io
+# Last tested using the 2Aug2023 stable LAMMPS version
+# This file was released under the GNU general public license v3.0
+
+# ⣿⣿⡆⠀⠀⠀⠀⠀⠀⣾⣿⣿⣆⠀⠀⠀⣿⣿⣿⣆⠀⠀⣰⣿⣿⣷⠀⢸⣿⣿⣷⡀⠀⢀⣾⣿⣿⠀⠀⣿⣿⣿⣿⣿⣷⣆⠀⢀⣶⣿⠿⠿⣿⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣠⣤⣶⣿⣿⣿⣦⡄⠀⠀⠀⠀⠀⠀⠀
+# ⣿⣿⡇⠀⠀⠀⠀⠀⣼⣿⡏⣿⣿⡄⠀⠀⣿⣿⡿⣿⡆⢰⣿⢿⣿⣿⠀⢸⣿⣿⢿⣧⠀⣾⡿⣿⣿⠀⠀⣿⣿⡇⠀⢈⣿⣿⠀⢸⣿⣧⣄⣀⡀⠀⠀⠀⠀⠀⠀⠀⢀⣤⣾⣿⣿⠏⣿⣿⣿⣿⣿⣿⣿⡄⠀⠀⠀⠀⠀⠀
+# ⣿⣿⡇⠀⠀⠀⠀⢰⣿⣿⣀⣸⣿⣷⡀⠀⣿⣿⡇⢻⣿⣿⡏⢸⣿⣿⠀⢸⣿⣿⠘⣿⣿⡿⠁⣿⣿⠀⠀⣿⣿⡿⠿⠿⠿⠋⠀⠀⠉⠛⠻⠿⣿⣷⠀⠀⠀⠀⠀⢠⣿⣿⣿⣿⣿⡄⠻⣿⣿⣿⣿⡿⠟⣃⠀⠀⠀⠀⠀⠀
+# ⣿⣿⣧⣤⣤⣤⢠⣿⣿⠛⠛⠛⢻⣿⣧⠀⣿⣿⡇⠀⠛⠛⠀⢸⣿⣿⠀⢸⣿⣿⠀⠘⠛⠃⠀⣿⣿⠀⠀⣿⣿⡇⠀⠀⠀⠀⠀⢰⣶⣤⣤⣤⣿⡿⠀⠀⠀⠀⠀⣻⣿⣿⣿⣿⣿⣿⣄⡀⠉⠉⠁⠀⢠⣿⡄⠀⠀⠀⠀⠀
+# ⠉⠉⠉⠉⠉⠉⠈⠉⠁⠀⠀⠀⠀⠉⠉⠀⠉⠉⠁⠀⠀⠀⠀⠈⠉⠉⠀⠈⠉⠉⠀⠀⠀⠀⠀⠉⠉⠀⠀⠉⠉⠁⠀⠀⠀⠀⠀⠀⠉⠉⠉⠉⠉⠀⠀⠀⠀⠀⠀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣶⣶⣾⣿⣿⡇⠀⠀⠀⠀⠀
+# ⢀⣤⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣤⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⣶⠀⠀⠀⠀⠀⠀⠀⠀⢰⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡃⠀⠀⠀⠀⠀
+# ⣼⣿⣴⡦⠀⣴⠀⠀⠀⣴⡄⢤⣿⣧⣶⠄⢀⣤⡶⣶⣄⠀⠀⣴⣤⣴⣦⢠⣦⠀⠀⣤⠶⢶⣤⡀⠀⢸⡇⠀⢠⣴⠶⢦⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣼⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣄⠀⠀⠀
+# ⢸⣿⠀⠀⠀⣿⠀⠀⠀⣿⡇⠀⣿⡆⠀⠀⣿⠇⠀⠀⢻⡇⠀⣿⡇⠀⠀⢸⣿⠀⠀⣠⣤⣤⣽⡇⠀⢸⡇⠀⢻⣧⣄⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⣀⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⡀⠀
+# ⠸⣿⠀⠀⠀⣿⡄⠀⢀⣿⡇⠀⣿⡇⠀⠀⢿⣇⠀⢀⣼⡇⠀⣿⡇⠀⠀⢸⣿⠀⢸⣏⠀⠀⣼⡇⠀⢸⡇⠀⡀⠀⠉⢹⣷⠀⠀⠀⠀⠀⠀⠀⣀⣴⣾⣿⣿⡟⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⠀
+# ⠀⠙⠛⠛⠀⠈⠛⠛⠋⠛⠁⠀⠈⠛⠛⠃⠈⠛⠛⠛⠋⠀⠀⠛⠃⠀⠀⠘⠛⠀⠈⠛⠛⠛⠙⠃⠀⠘⠃⠀⠙⠛⠛⠛⠁⠀⠀⠀⠀⠀⢠⣾⣿⣿⣿⣿⣿⠀⣼⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇
+# ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣴⣿⣿⣿⣿⣿⣿⣿⡀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+#⠀ ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡏
+# ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡘⣿⣿⣿⣿⣿⡏⣼⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠁
+# ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠨⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⡈⠻⣿⣿⣿⣇⠸⣿⣿⣿⣿⣿⣿⡿⢻⣿⣿⠿⠋⠁⠀
+# ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⡀⠈⠻⢿⣿⣦⣈⠙⠛⠛⠛⣁⣴⡿⠛⠁⠀⠀⠀⠀
+# ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦⡀⠀⠈⠉⠛⠛⠓⠚⠋⠉⠁⠀⠀⠀⠀⠀⠀⠀
+# ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠻⠿⣿⣿⣿⣿⡿⠟⠋⠀
+
+mass 1 15.9994 # PEG O (GROMOS 54A7)
+mass 2 12.011 # PEG C (GROMOS 54A7)
+mass 3 1.008 # PEG H (GROMOS 54A7)
+mass 4 1.008 # PEG H (GROMOS 54A7)
+mass 5 12.011 # PEG C (GROMOS 54A7)
+mass 6 15.9994 # PEG O (GROMOS 54A7)
+mass 7 15.9994 # PEG O (GROMOS 54A7)
+mass 8 15.9994 # H2O O (SPC/Fw)
+mass 9 1.008 # H2O H (SPC/Fw)
+
+pair_coeff 1 1 0.2526 2.8492 # PEG O (GROMOS 54A7)
+pair_coeff 2 2 0.0663 3.5812 # PEG C (GROMOS 54A7)
+pair_coeff 3 3 0.0283 2.3734 # PEG H (GROMOS 54A7)
+pair_coeff 4 4 0.0 0.0 # PEG H (GROMOS 54A7)
+pair_coeff 5 5 0.2450 2.8114 # PEG C (GROMOS 54A7)
+pair_coeff 6 6 0.1195 3.1000 # PEG O (GROMOS 54A7)
+pair_coeff 7 7 0.1195 3.1000 # PEG O (GROMOS 54A7)
+pair_coeff 8 8 0.155 3.165  # H2O O (SPC/Fw)
+pair_coeff 9 9 0.0 0.0 # H2O H (SPC/Fw)
+
+bond_coeff 1 1109.2926 1.12
+bond_coeff 2 399.7916 1.43
+bond_coeff 3 299.8440 1.52
+bond_coeff 4 400.0343 1.53
+bond_coeff 5 310.7075 1.41
+bond_coeff 6 179.2543 0.971
+bond_coeff 7 1059.162 1.012 # H2O O-H (SPC/Fw)
+
+angle_coeff 1 47.6940 109.5
+angle_coeff 2 55.1271 109.5
+angle_coeff 3 47.6350 109.6
+angle_coeff 4 55.1139 111.0
+angle_coeff 5 54.9931 110.3
+angle_coeff 6 180.4602 109.0
+angle_coeff 7 30.1731 110.0
+angle_coeff 8 75.90 113.24 # H2O H-O-H (SPC/Fw)
+
+dihedral_coeff 1 0.3011 1 3
+dihedral_coeff 2 1.4149 1 3
+dihedral_coeff 3 0.2390 -1 3
+dihedral_coeff 4 0.0 1 1
+
+
+molecule h2omol H2O-SPCFw.mol
+Read molecule template h2omol:
+# LAMMPS input script by Simon Gravelle
+  1 molecules
+  0 fragments
+  3 atoms with max type 9
+  2 bonds with max type 7
+  1 angles with max type 8
+  0 dihedrals with max type 0
+  0 impropers with max type 0
+create_atoms 0 random 1050 87910 NULL mol 	h2omol 454756 overlap 1.0 maxtry 50
+Created 3150 atoms
+  using lattice units in orthogonal box = (-45 -15 -15) to (45 15 15)
+  create_atoms CPU = 0.037 seconds
+
+group H2O type 8 9
+3150 atoms in group H2O
+minimize 1.0e-4 1.0e-6 100 1000
+PPPM initialization ...
+  using 12-bit tables for long-range coulomb (src/kspace.cpp:342)
+  G vector (1/distance) = 0.24260915
+  grid = 45 20 20
+  stencil order = 5
+  estimated absolute RMS force accuracy = 0.0037472136
+  estimated relative force accuracy = 1.1284623e-05
+  using double precision KISS FFT
+  3d grid and FFT values/proc = 37179 18000
+Generated 36 of 36 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 1 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 14
+  ghost atom cutoff = 14
+  binsize = 7, bins = 13 5 5
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair lj/cut/coul/long, perpetual
+      attributes: half, newton on
+      pair build: half/bin/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 20.02 | 20.02 | 20.02 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press     
+         0   0              18103.161      0.40465931     18103.566      66126.308    
+       100   0             -8029.0081      216.18569     -7812.8224     -1604.4056    
+Loop time of 7.57612 on 1 procs for 100 steps with 3150 atoms
+
+100.0% CPU use with 1 MPI tasks x 1 OpenMP threads
+
+Minimization stats:
+  Stopping criterion = max iterations
+  Energy initial, next-to-last, final = 
+      18103.5657508968  -7759.34002720835  -7812.82238657326
+  Force two-norm initial, final = 50808.698 313.96835
+  Force max component initial, final = 25084.045 57.984922
+  Final line search alpha, max atom move = 0.0010482303 0.060781551
+  Iterations, force evaluations = 100 174
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 5.5559     | 5.5559     | 5.5559     |   0.0 | 73.34
+Bond    | 0.033589   | 0.033589   | 0.033589   |   0.0 |  0.44
+Kspace  | 1.8431     | 1.8431     | 1.8431     |   0.0 | 24.33
+Neigh   | 0.086383   | 0.086383   | 0.086383   |   0.0 |  1.14
+Comm    | 0.027281   | 0.027281   | 0.027281   |   0.0 |  0.36
+Output  | 7.3099e-05 | 7.3099e-05 | 7.3099e-05 |   0.0 |  0.00
+Modify  | 0          | 0          | 0          |   0.0 |  0.00
+Other   |            | 0.02978    |            |       |  0.39
+
+Nlocal:           3150 ave        3150 max        3150 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:          12315 ave       12315 max       12315 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:         703883 ave      703883 max      703883 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 703883
+Ave neighs/atom = 223.45492
+Ave special neighs/atom = 2
+Neighbor list builds = 3
+Dangerous builds = 0

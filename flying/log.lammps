@@ -1,0 +1,225 @@
+LAMMPS (17 Apr 2024)
+OMP_NUM_THREADS environment is not set. Defaulting to 1 thread. (src/comm.cpp:98)
+  using 1 OpenMP thread(s) per MPI task
+# LAMMPS input script by Simon Gravelle
+# This input is part of a tutorial from https://lammpstutorials.github.io
+# Last tested using the 2Aug2023 stable LAMMPS version
+# This file was released under the GNU general public license v3.0
+
+# ⣿⣿⡆⠀⠀⠀⠀⠀⠀⣾⣿⣿⣆⠀⠀⠀⣿⣿⣿⣆⠀⠀⣰⣿⣿⣷⠀⢸⣿⣿⣷⡀⠀⢀⣾⣿⣿⠀⠀⣿⣿⣿⣿⣿⣷⣆⠀⢀⣶⣿⠿⠿⣿⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣠⣤⣶⣿⣿⣿⣦⡄⠀⠀⠀⠀⠀⠀⠀
+# ⣿⣿⡇⠀⠀⠀⠀⠀⣼⣿⡏⣿⣿⡄⠀⠀⣿⣿⡿⣿⡆⢰⣿⢿⣿⣿⠀⢸⣿⣿⢿⣧⠀⣾⡿⣿⣿⠀⠀⣿⣿⡇⠀⢈⣿⣿⠀⢸⣿⣧⣄⣀⡀⠀⠀⠀⠀⠀⠀⠀⢀⣤⣾⣿⣿⠏⣿⣿⣿⣿⣿⣿⣿⡄⠀⠀⠀⠀⠀⠀
+# ⣿⣿⡇⠀⠀⠀⠀⢰⣿⣿⣀⣸⣿⣷⡀⠀⣿⣿⡇⢻⣿⣿⡏⢸⣿⣿⠀⢸⣿⣿⠘⣿⣿⡿⠁⣿⣿⠀⠀⣿⣿⡿⠿⠿⠿⠋⠀⠀⠉⠛⠻⠿⣿⣷⠀⠀⠀⠀⠀⢠⣿⣿⣿⣿⣿⡄⠻⣿⣿⣿⣿⡿⠟⣃⠀⠀⠀⠀⠀⠀
+# ⣿⣿⣧⣤⣤⣤⢠⣿⣿⠛⠛⠛⢻⣿⣧⠀⣿⣿⡇⠀⠛⠛⠀⢸⣿⣿⠀⢸⣿⣿⠀⠘⠛⠃⠀⣿⣿⠀⠀⣿⣿⡇⠀⠀⠀⠀⠀⢰⣶⣤⣤⣤⣿⡿⠀⠀⠀⠀⠀⣻⣿⣿⣿⣿⣿⣿⣄⡀⠉⠉⠁⠀⢠⣿⡄⠀⠀⠀⠀⠀
+# ⠉⠉⠉⠉⠉⠉⠈⠉⠁⠀⠀⠀⠀⠉⠉⠀⠉⠉⠁⠀⠀⠀⠀⠈⠉⠉⠀⠈⠉⠉⠀⠀⠀⠀⠀⠉⠉⠀⠀⠉⠉⠁⠀⠀⠀⠀⠀⠀⠉⠉⠉⠉⠉⠀⠀⠀⠀⠀⠀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣶⣶⣾⣿⣿⡇⠀⠀⠀⠀⠀
+# ⢀⣤⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣤⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⣶⠀⠀⠀⠀⠀⠀⠀⠀⢰⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡃⠀⠀⠀⠀⠀
+# ⣼⣿⣴⡦⠀⣴⠀⠀⠀⣴⡄⢤⣿⣧⣶⠄⢀⣤⡶⣶⣄⠀⠀⣴⣤⣴⣦⢠⣦⠀⠀⣤⠶⢶⣤⡀⠀⢸⡇⠀⢠⣴⠶⢦⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣼⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣄⠀⠀⠀
+# ⢸⣿⠀⠀⠀⣿⠀⠀⠀⣿⡇⠀⣿⡆⠀⠀⣿⠇⠀⠀⢻⡇⠀⣿⡇⠀⠀⢸⣿⠀⠀⣠⣤⣤⣽⡇⠀⢸⡇⠀⢻⣧⣄⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⣀⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⡀⠀
+# ⠸⣿⠀⠀⠀⣿⡄⠀⢀⣿⡇⠀⣿⡇⠀⠀⢿⣇⠀⢀⣼⡇⠀⣿⡇⠀⠀⢸⣿⠀⢸⣏⠀⠀⣼⡇⠀⢸⡇⠀⡀⠀⠉⢹⣷⠀⠀⠀⠀⠀⠀⠀⣀⣴⣾⣿⣿⡟⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⠀
+# ⠀⠙⠛⠛⠀⠈⠛⠛⠋⠛⠁⠀⠈⠛⠛⠃⠈⠛⠛⠛⠋⠀⠀⠛⠃⠀⠀⠘⠛⠀⠈⠛⠛⠛⠙⠃⠀⠘⠃⠀⠙⠛⠛⠛⠁⠀⠀⠀⠀⠀⢠⣾⣿⣿⣿⣿⣿⠀⣼⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇
+# ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣴⣿⣿⣿⣿⣿⣿⣿⡀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+#⠀ ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡏
+# ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡘⣿⣿⣿⣿⣿⡏⣼⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠁
+# ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠨⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⡈⠻⣿⣿⣿⣇⠸⣿⣿⣿⣿⣿⣿⡿⢻⣿⣿⠿⠋⠁⠀
+# ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⡀⠈⠻⢿⣿⣦⣈⠙⠛⠛⠛⣁⣴⡿⠛⠁⠀⠀⠀⠀
+# ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦⡀⠀⠈⠉⠛⠛⠓⠚⠋⠉⠁⠀⠀⠀⠀⠀⠀⠀
+# ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠻⠿⣿⣿⣿⣿⡿⠟⠋⠀
+
+variable T equal 300
+
+units real
+atom_style molecular
+boundary f f f
+pair_style lj/cut 14
+
+bond_style harmonic
+angle_style harmonic
+dihedral_style opls
+improper_style harmonic
+
+special_bonds lj 0.0 0.0 0.5
+
+read_data cnt_mole.data
+Reading data file ...
+  orthogonal box = (-40 -40 -40) to (40 40 40)
+  1 by 1 by 1 MPI processor grid
+  reading atoms ...
+  690 atoms
+  reading velocities ...
+  690 velocities
+  scanning bonds ...
+  3 = max bonds/atom
+  scanning angles ...
+  3 = max angles/atom
+  scanning dihedrals ...
+  12 = max dihedrals/atom
+  scanning impropers ...
+  3 = max impropers/atom
+  orthogonal box = (-40 -40 -40) to (40 40 40)
+  1 by 1 by 1 MPI processor grid
+  reading bonds ...
+  1005 bonds
+  reading angles ...
+  1950 angles
+  reading dihedrals ...
+  3791 dihedrals
+  reading impropers ...
+  630 impropers
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0       
+     3 = max # of 1-2 neighbors
+     6 = max # of 1-3 neighbors
+    18 = max # of 1-4 neighbors
+    18 = max # of special neighbors
+  special bonds CPU = 0.001 seconds
+  read_data CPU = 0.045 seconds
+include parm.lammps
+# LAMMPS input script by Simon Gravelle
+# This input is part of a tutorial from https://lammpstutorials.github.io
+# Last tested using the 2Aug2023 stable LAMMPS version
+# This file was released under the GNU general public license v3.0
+
+# ⣿⣿⡆⠀⠀⠀⠀⠀⠀⣾⣿⣿⣆⠀⠀⠀⣿⣿⣿⣆⠀⠀⣰⣿⣿⣷⠀⢸⣿⣿⣷⡀⠀⢀⣾⣿⣿⠀⠀⣿⣿⣿⣿⣿⣷⣆⠀⢀⣶⣿⠿⠿⣿⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣠⣤⣶⣿⣿⣿⣦⡄⠀⠀⠀⠀⠀⠀⠀
+# ⣿⣿⡇⠀⠀⠀⠀⠀⣼⣿⡏⣿⣿⡄⠀⠀⣿⣿⡿⣿⡆⢰⣿⢿⣿⣿⠀⢸⣿⣿⢿⣧⠀⣾⡿⣿⣿⠀⠀⣿⣿⡇⠀⢈⣿⣿⠀⢸⣿⣧⣄⣀⡀⠀⠀⠀⠀⠀⠀⠀⢀⣤⣾⣿⣿⠏⣿⣿⣿⣿⣿⣿⣿⡄⠀⠀⠀⠀⠀⠀
+# ⣿⣿⡇⠀⠀⠀⠀⢰⣿⣿⣀⣸⣿⣷⡀⠀⣿⣿⡇⢻⣿⣿⡏⢸⣿⣿⠀⢸⣿⣿⠘⣿⣿⡿⠁⣿⣿⠀⠀⣿⣿⡿⠿⠿⠿⠋⠀⠀⠉⠛⠻⠿⣿⣷⠀⠀⠀⠀⠀⢠⣿⣿⣿⣿⣿⡄⠻⣿⣿⣿⣿⡿⠟⣃⠀⠀⠀⠀⠀⠀
+# ⣿⣿⣧⣤⣤⣤⢠⣿⣿⠛⠛⠛⢻⣿⣧⠀⣿⣿⡇⠀⠛⠛⠀⢸⣿⣿⠀⢸⣿⣿⠀⠘⠛⠃⠀⣿⣿⠀⠀⣿⣿⡇⠀⠀⠀⠀⠀⢰⣶⣤⣤⣤⣿⡿⠀⠀⠀⠀⠀⣻⣿⣿⣿⣿⣿⣿⣄⡀⠉⠉⠁⠀⢠⣿⡄⠀⠀⠀⠀⠀
+# ⠉⠉⠉⠉⠉⠉⠈⠉⠁⠀⠀⠀⠀⠉⠉⠀⠉⠉⠁⠀⠀⠀⠀⠈⠉⠉⠀⠈⠉⠉⠀⠀⠀⠀⠀⠉⠉⠀⠀⠉⠉⠁⠀⠀⠀⠀⠀⠀⠉⠉⠉⠉⠉⠀⠀⠀⠀⠀⠀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣶⣶⣾⣿⣿⡇⠀⠀⠀⠀⠀
+# ⢀⣤⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣤⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⣶⠀⠀⠀⠀⠀⠀⠀⠀⢰⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡃⠀⠀⠀⠀⠀
+# ⣼⣿⣴⡦⠀⣴⠀⠀⠀⣴⡄⢤⣿⣧⣶⠄⢀⣤⡶⣶⣄⠀⠀⣴⣤⣴⣦⢠⣦⠀⠀⣤⠶⢶⣤⡀⠀⢸⡇⠀⢠⣴⠶⢦⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣼⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣄⠀⠀⠀
+# ⢸⣿⠀⠀⠀⣿⠀⠀⠀⣿⡇⠀⣿⡆⠀⠀⣿⠇⠀⠀⢻⡇⠀⣿⡇⠀⠀⢸⣿⠀⠀⣠⣤⣤⣽⡇⠀⢸⡇⠀⢻⣧⣄⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⣀⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⡀⠀
+# ⠸⣿⠀⠀⠀⣿⡄⠀⢀⣿⡇⠀⣿⡇⠀⠀⢿⣇⠀⢀⣼⡇⠀⣿⡇⠀⠀⢸⣿⠀⢸⣏⠀⠀⣼⡇⠀⢸⡇⠀⡀⠀⠉⢹⣷⠀⠀⠀⠀⠀⠀⠀⣀⣴⣾⣿⣿⡟⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⠀
+# ⠀⠙⠛⠛⠀⠈⠛⠛⠋⠛⠁⠀⠈⠛⠛⠃⠈⠛⠛⠛⠋⠀⠀⠛⠃⠀⠀⠘⠛⠀⠈⠛⠛⠛⠙⠃⠀⠘⠃⠀⠙⠛⠛⠛⠁⠀⠀⠀⠀⠀⢠⣾⣿⣿⣿⣿⣿⠀⣼⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇
+# ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣴⣿⣿⣿⣿⣿⣿⣿⡀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+#⠀ ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡏
+# ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡘⣿⣿⣿⣿⣿⡏⣼⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠁
+# ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠨⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⡈⠻⣿⣿⣿⣇⠸⣿⣿⣿⣿⣿⣿⡿⢻⣿⣿⠿⠋⠁⠀
+# ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⡀⠈⠻⢿⣿⣦⣈⠙⠛⠛⠛⣁⣴⡿⠛⠁⠀⠀⠀⠀
+# ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦⡀⠀⠈⠉⠛⠛⠓⠚⠋⠉⠁⠀⠀⠀⠀⠀⠀⠀
+# ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠻⠿⣿⣿⣿⣿⡿⠟⠋⠀
+
+# OPLS-AA 10.1021/ja9621760
+pair_coeff 1 1 0.066 3.4
+bond_coeff 1 469 1.4
+angle_coeff 1 63 120
+dihedral_coeff 1 0 7.25 0 0
+improper_coeff 1 5 180
+
+group carbon_atoms type 1
+690 atoms in group carbon_atoms
+
+velocity all create ${T} 12345 mom yes rot yes dist gaussian
+velocity all create 300 12345 mom yes rot yes dist gaussian
+
+fix mymom all momentum 1 linear 1 1 1
+
+minimize 1.0e-4 1.0e-6 100 1000
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 1 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 16
+  ghost atom cutoff = 16
+  binsize = 8, bins = 10 10 10
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair lj/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 14.39 | 14.39 | 14.39 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press     
+         0   300            588.66967      1980.7099      3185.513       53.341933    
+         1   300            588.67541      1980.6093      3185.4182      53.388826    
+Loop time of 0.0155075 on 1 procs for 1 steps with 690 atoms
+
+100.0% CPU use with 1 MPI tasks x 1 OpenMP threads
+
+Minimization stats:
+  Stopping criterion = energy tolerance
+  Energy initial, next-to-last, final = 
+      2569.37955753597   2569.37955753597   2569.28475432644
+  Force two-norm initial, final = 21.228822 10.053603
+  Force max component initial, final = 1.7244192 0.75729793
+  Final line search alpha, max atom move = 0.057990539 0.043916115
+  Iterations, force evaluations = 1 2
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.011973   | 0.011973   | 0.011973   |   0.0 | 77.21
+Bond    | 0.0034215  | 0.0034215  | 0.0034215  |   0.0 | 22.06
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 1.942e-06  | 1.942e-06  | 1.942e-06  |   0.0 |  0.01
+Output  | 0          | 0          | 0          |   0.0 |  0.00
+Modify  | 0          | 0          | 0          |   0.0 |  0.00
+Other   |            | 0.0001107  |            |       |  0.71
+
+Nlocal:            690 ave         690 max         690 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:              0 ave           0 max           0 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:         101156 ave      101156 max      101156 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 101156
+Ave neighs/atom = 146.6029
+Ave special neighs/atom = 16.901449
+Neighbor list builds = 0
+Dangerous builds = 0
+
+fix mynve all nve
+#fix myber all nvt temp ${T} ${T} 100
+fix mynvt all nvt temp ${T} ${T} 100
+fix mynvt all nvt temp 300 ${T} 100
+fix mynvt all nvt temp 300 300 100
+
+thermo 1000
+dump mydmp all atom 1000 dump.lammpstrj
+
+timestep 0.01
+run 10000
+Generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+WARNING: One or more atoms are time integrated more than once (src/modify.cpp:289)
+Per MPI rank memory allocation (min/avg/max) = 13.26 | 13.26 | 13.26 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press     
+         1   300            588.67541      1980.6093      3185.4182      53.388826    
+      1000   173.78618      590.20418      2240.8941      3188.0165     -0.36528573   
+      2000   155.85798      596.92377      2276.8557      3193.8772     -22.554754    
+      3000   149.86118      590.83606      2303.5248      3202.1425     -5.607097     
+      4000   158.67117      602.09652      2283.2328      3211.2047      3.0271823    
+      5000   161.63046      605.29711      2282.1572      3219.4074      36.518026    
+      6000   164.01668      606.7787       2283.624       3227.2566      39.248151    
+      7000   162.3316       610.30548      2291.9525      3235.6511      38.655488    
+      8000   161.66303      600.05706      2312.8321      3244.9092      43.250023    
+      9000   160.02875      603.47912      2322.6697      3254.8124      7.6994846    
+     10000   163.12714      603.80195      2326.7166      3265.5455      0.74490999   
+     10001   163.05439      603.79638      2326.8821      3265.556       0.70951898   
+Loop time of 41.6308 on 1 procs for 10000 steps with 690 atoms
+
+Performance: 0.208 ns/day, 115.641 hours/ns, 240.207 timesteps/s, 165.743 katom-step/s
+100.0% CPU use with 1 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 30.516     | 30.516     | 30.516     |   0.0 | 73.30
+Bond    | 10.591     | 10.591     | 10.591     |   0.0 | 25.44
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 0.0052534  | 0.0052534  | 0.0052534  |   0.0 |  0.01
+Output  | 0.004979   | 0.004979   | 0.004979   |   0.0 |  0.01
+Modify  | 0.46092    | 0.46092    | 0.46092    |   0.0 |  1.11
+Other   |            | 0.0525     |            |       |  0.13
+
+Nlocal:            690 ave         690 max         690 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:              0 ave           0 max           0 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:         101157 ave      101157 max      101157 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 101157
+Ave neighs/atom = 146.60435
+Ave special neighs/atom = 16.901449
+Neighbor list builds = 0
+Dangerous builds = 0
+Total wall time: 0:00:41

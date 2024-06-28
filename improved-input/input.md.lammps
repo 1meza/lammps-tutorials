@@ -1,0 +1,53 @@
+# 1) Initialization
+units lj # use lennard jones system of units
+dimension 3 # 3D simulation
+atom_style atomic # each atom is a dot with mass
+pair_style lj/cut 2.5 # use lennard jones potential with cutoff r_c = 2.5 (unitless) 
+boundary p p p # periodic boundary conditions used in all 3 directions 
+
+# 2) System definition
+read_data minimized_coordinate.data # read the minimized coordinates from the file
+region region_cylinder_in cylinder z 0 0 10 INF INF side in # deinfe a cylinder region in the cylinder
+region region_cylinder_out cylinder z 0 0 10 INF INF side out # define a cylinder region out of the cylinder
+group group_type_1 type 1 # define a group of atoms of type 1
+group group_type_2 type 2 # define a group of atoms of type 2
+group group_region_in region region_cylinder_in # define a group of atoms in the cylinder
+group group_region_out region region_cylinder_out # define a group of atoms out of the cylinder
+group group_type_1_in intersect group_type_1 group_region_in # define atom groups based on the intersection between the previously defined groups
+group group_type_2_out intersect group_type_2 group_region_out 
+delete_atoms group group_type_1_in # delete the atom type 1 that are located within the cylinder
+delete_atoms group group_type_2_out # delete the atoms of type 2 that are located outside the cylinder
+
+# 4) Visualization
+thermo 1000 # print out the thermodynamic properties every 1000 steps
+dump mydmp all atom 1000 dump.md.lammpstrj # dump the atom coordinates every 1000 steps
+
+# count the numbder of atoms of a specific group in the region_cylinder_in
+variable number_type1_in equal count(group_type_1,region_cylinder_in) 
+variable number_type2_in equal count(group_type_2,region_cylinder_in) 
+# calling previously defined variables, variables are evaluated every 10 steps, averaged 200 times printed to the .dat file every 2000 steps
+fix myat1 all ave/time 10 200 2000 v_number_type1_in &  
+    file output-population1vstime.dat 
+fix myat2 all ave/time 10 200 2000 v_number_type2_in & 
+    file output-population2vstime.dat
+
+# compute the coordination number between atom types 1 and 2
+compute coor12 group_type_1 coord/atom cutoff 2.0 group group_type_2  
+# compute the average coordination number between atom types 1 and 2
+compute sumcoor12 all reduce ave c_coor12 
+# evaluate the coordination number every 10 steps, average 200 times, print to the .dat file every 2000 steps
+fix myat3 all ave/time 10 200 2000 &
+    c_sumcoor12 file coordinationnumber12.dat 
+# 5) Run
+# create a velocity for all atoms, temperature 1.0, seed 4928459, momentum and rotation yes, distribution gaussian
+velocity all create 1.0 4928459 mom yes rot yes dist gaussian 
+fix mynve all nve # use NVE ensemble
+# use langevin thermostat with damping coefficient 1.0, temperature 1.0, seed 1530917, zero yes, ensures that the total random force is zero
+fix mylgv all langevin 1.0 1.0 0.1 1530917 zero yes 
+
+# timestep 0.005, run 300000 steps, write the data to the file
+timestep 0.005
+run 300000
+write_data mixed.data
+
+

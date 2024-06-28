@@ -1,0 +1,237 @@
+LAMMPS (17 Apr 2024)
+OMP_NUM_THREADS environment is not set. Defaulting to 1 thread. (src/comm.cpp:98)
+  using 1 OpenMP thread(s) per MPI task
+
+variable T equal 500
+
+units real
+atom_style molecular
+boundary p p p
+pair_style lj/cut 14
+
+bond_style harmonic
+angle_style harmonic
+dihedral_style opls
+improper_style harmonic
+
+special_bonds lj 0.0 0.0 0.5
+
+read_data cnt_molecular.data
+Reading data file ...
+  orthogonal box = (-100 -100 -100) to (100 100 100)
+  1 by 1 by 1 MPI processor grid
+  reading atoms ...
+  700 atoms
+  scanning bonds ...
+  3 = max bonds/atom
+  scanning angles ...
+  3 = max angles/atom
+  scanning dihedrals ...
+  12 = max dihedrals/atom
+  scanning impropers ...
+  3 = max impropers/atom
+  orthogonal box = (-100 -100 -100) to (100 100 100)
+  1 by 1 by 1 MPI processor grid
+  reading bonds ...
+  1035 bonds
+  reading angles ...
+  2040 angles
+  reading dihedrals ...
+  4030 dihedrals
+  reading impropers ...
+  670 impropers
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0       
+     3 = max # of 1-2 neighbors
+     6 = max # of 1-3 neighbors
+    18 = max # of 1-4 neighbors
+    18 = max # of special neighbors
+  special bonds CPU = 0.002 seconds
+  read_data CPU = 0.070 seconds
+include parm.lammps
+pair_coeff 1 1 0.066047 3.4
+pair_coeff 2 2 0.232 3.3952
+bond_coeff 1 469 1.4
+angle_coeff 1 63 120
+dihedral_coeff 1 0 7.25 0 0
+improper_coeff 1 5 180
+
+group carbon_atoms type 1 # CNT atoms
+700 atoms in group carbon_atoms
+
+# move the CNT to the center of the box
+variable carbon_xcm equal -1*xcm(carbon_atoms,x)
+variable carbon_ycm equal -1*xcm(carbon_atoms,y)
+variable carbon_zcm equal -1*xcm(carbon_atoms,z)
+displace_atoms carbon_atoms move ${carbon_xcm} ${carbon_ycm} ${carbon_zcm}
+displace_atoms carbon_atoms move 8.45130634422529e-18 ${carbon_ycm} ${carbon_zcm}
+displace_atoms carbon_atoms move 8.45130634422529e-18 1.0914862143567e-15 ${carbon_zcm}
+displace_atoms carbon_atoms move 8.45130634422529e-18 1.0914862143567e-15 -27.8695884500003
+Displacing atoms ...
+
+# move the CNT to the center of the box
+change_box all x final -100 100 y final -100 100 z final -100 100
+Changing box ...
+  orthogonal box = (-100 -100 -100) to (100 100 100)
+  orthogonal box = (-100 -100 -100) to (100 100 100)
+  orthogonal box = (-100 -100 -100) to (100 100 100)
+
+# create a gas phase
+delete_atoms random fraction 0.04 no carbon_atoms NULL 782793 bond yes
+WARNING: Ignoring 'compress yes' for molecular system (src/delete_atoms.cpp:140)
+Deleted 32 atoms, new total = 668
+Deleted 91 bonds, new total = 944
+Deleted 259 angles, new total = 1781
+Deleted 665 dihedrals, new total = 3365
+Deleted 109 impropers, new total = 561
+
+
+variable zmax equal bound(carbon_atoms,zmax) # find the max and min z values of the CNT
+variable zmin equal bound(carbon_atoms,zmin)
+region inside_CNT cylinder z 0 0 2.5 ${zmin} ${zmax} # create a region inside the CNT
+region inside_CNT cylinder z 0 0 2.5 -27.8695884500003 ${zmax} 
+region inside_CNT cylinder z 0 0 2.5 -27.8695884500003 27.8695895499997 
+create_atoms 2 random 40 323485 inside_CNT overlap 1.8 maxtry 50 # create 40 gas atoms inside the CNT
+Created 40 atoms
+  using lattice units in orthogonal box = (-100 -100 -100) to (100 100 100)
+  create_atoms CPU = 0.001 seconds
+
+
+group CNT type 1
+668 atoms in group CNT
+group gas type 2
+40 atoms in group gas
+
+reset_atoms id sort yes
+Resetting atom IDs ...
+Generated 1 of 1 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update: every = 1 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 16
+  ghost atom cutoff = 16
+  binsize = 8, bins = 25 25 25
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair lj/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/newton
+      stencil: half/bin/3d
+      bin: standard
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0.5     
+  special bond factors coul:  0        0        0       
+     3 = max # of 1-2 neighbors
+     6 = max # of 1-3 neighbors
+    18 = max # of 1-4 neighbors
+    18 = max # of special neighbors
+  special bonds CPU = 0.004 seconds
+
+minimize 1.0e-4 1.0e-6 100 1000
+Generated 1 of 1 mixed pair_coeff terms from geometric mixing rule
+Per MPI rank memory allocation (min/avg/max) = 14.51 | 14.51 | 14.51 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press     
+         0   0              6469.6166      1835.2965      8304.9132      185.05546    
+       100   0              457.0926       1770.712       2227.8047     -0.015904149  
+Loop time of 1.47353 on 1 procs for 100 steps with 708 atoms
+
+99.9% CPU use with 1 MPI tasks x 1 OpenMP threads
+
+Minimization stats:
+  Stopping criterion = max iterations
+  Energy initial, next-to-last, final = 
+      8304.91315530454   2228.07113728684   2227.80465050511
+  Force two-norm initial, final = 14354.011 24.14738
+  Force max component initial, final = 5600.1242 2.2498862
+  Final line search alpha, max atom move = 0.0022786996 0.0051268146
+  Iterations, force evaluations = 100 188
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 1.1579     | 1.1579     | 1.1579     |   0.0 | 78.58
+Bond    | 0.28073    | 0.28073    | 0.28073    |   0.0 | 19.05
+Neigh   | 0.021081   | 0.021081   | 0.021081   |   0.0 |  1.43
+Comm    | 0.0008885  | 0.0008885  | 0.0008885  |   0.0 |  0.06
+Output  | 0.00017218 | 0.00017218 | 0.00017218 |   0.0 |  0.01
+Modify  | 0          | 0          | 0          |   0.0 |  0.00
+Other   |            | 0.01281    |            |       |  0.87
+
+Nlocal:            708 ave         708 max         708 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:              0 ave           0 max           0 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:         108612 ave      108612 max      108612 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 108612
+Ave neighs/atom = 153.40678
+Ave special neighs/atom = 15.025424
+Neighbor list builds = 4
+Dangerous builds = 0
+reset_timestep 0
+
+# create a velocity for the gas atoms
+velocity all create ${T} 48455 mom yes rot yes
+velocity all create 500 48455 mom yes rot yes
+fix mynve all nve
+compute tcar carbon_atoms temp # compute the temperature of the CNT
+fix myber1 all temp/berendsen ${T} ${T} 100 # fix the temperature of the CNT
+fix myber1 all temp/berendsen 500 ${T} 100 
+fix myber1 all temp/berendsen 500 500 100 
+fix_modify myber1 temp tcar # modify the fix to compute tcar
+WARNING: Group for fix_modify temp != fix group: all vs carbon_atoms (src/fix_temp_berendsen.cpp:215)
+compute tgas gas temp # compute the temperature of the gas
+fix myber2 all temp/berendsen ${T} ${T} 100 # fix the temperature of the gas
+fix myber2 all temp/berendsen 500 ${T} 100 
+fix myber2 all temp/berendsen 500 500 100 
+fix_modify myber2 temp tgas # modify the fix to compute tgas
+WARNING: Group for fix_modify temp != fix group: all vs gas (src/fix_temp_berendsen.cpp:215)
+fix myspr carbon_atoms spring/self 5 # fix the CNT atoms to keep the CNT straight
+timestep 1.0 # set the timestep
+
+dump mydmp all atom 1000 dump.lammpstrj
+thermo 1000
+
+run 8000
+Generated 1 of 1 mixed pair_coeff terms from geometric mixing rule
+Per MPI rank memory allocation (min/avg/max) = 13.76 | 13.76 | 13.76 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press     
+         0   500            457.0926       1770.712       3281.521       6.0050675    
+      1000   434.69261      525.57833      2549.843       3991.5068      3.0803836    
+      2000   434.68283      517.27218      2565.8369      3999.1739      3.252977     
+      3000   426.55724      518.58136      2614.8095      4032.3316     -5.3728017    
+      4000   453.16651      548.24727      2617.5217      4120.7869      3.1270571    
+      5000   447.60306      544.06         2633.0313      4120.3847      1.5424886    
+      6000   454.95676      542.72643      2621.6976      4123.2147      6.7626527    
+      7000   456.61303      544.4098       2641.0854      4147.7764     -0.92217625   
+      8000   460.66663      539.48494      2593.634       4103.9429     -0.032505642  
+Loop time of 48.7216 on 1 procs for 8000 steps with 708 atoms
+
+Performance: 14.187 ns/day, 1.692 hours/ns, 164.198 timesteps/s, 116.252 katom-step/s
+99.9% CPU use with 1 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 36.358     | 36.358     | 36.358     |   0.0 | 74.62
+Bond    | 11.192     | 11.192     | 11.192     |   0.0 | 22.97
+Neigh   | 0.48013    | 0.48013    | 0.48013    |   0.0 |  0.99
+Comm    | 0.036354   | 0.036354   | 0.036354   |   0.0 |  0.07
+Output  | 0.0074335  | 0.0074335  | 0.0074335  |   0.0 |  0.02
+Modify  | 0.53405    | 0.53405    | 0.53405    |   0.0 |  1.10
+Other   |            | 0.1144     |            |       |  0.23
+
+Nlocal:            708 ave         708 max         708 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:              1 ave           1 max           1 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:         103585 ave      103585 max      103585 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 103585
+Ave neighs/atom = 146.3065
+Ave special neighs/atom = 15.025424
+Neighbor list builds = 89
+Dangerous builds = 0
+Total wall time: 0:00:50

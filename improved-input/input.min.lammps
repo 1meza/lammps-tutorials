@@ -1,0 +1,31 @@
+# 1) Initialization
+units lj # use lennard jones system of units
+dimension 3 # 3D simulation
+atom_style atomic # each atom is a dot with mass
+pair_style lj/cut 2.5 # use lennard jones potential with cutoff r_c = 2.5 (unitless) 
+boundary p p p # periodic boundary conditions used in all 3 directions 
+
+# 2) System definition
+region simulation_box block -20 20 -20 20 -20 20 # create a simulation box with dimensions -20 < x < 20, -20 < y < 20, -20 < z < 20
+create_box 2 simulation_box # create a box with 2 atom types
+region region_cylinder_in cylinder z 0 0 10 INF INF side in # side in defines the region that are respectively inside the cylinder
+region region_cylinder_out cylinder z 0 0 10 INF INF side out # side out defines the region that are respectively outside the cylinder
+create_atoms 1 random 1000 341341 region_cylinder_out # create 1000 atoms of type 1 randomly in the region outside the cylinder, with seed 341341
+create_atoms 2 random 150 127569 region_cylinder_in # create 150 atoms of type 2 randomly in the region inside the cylinder, with seed 127569
+
+# 3) Simulation settings
+mass 1 1 # mass of atom type 1 is 1
+mass 2 1 # mass of atom type 2 is 1
+pair_coeff 1 1 1.0 1.0 # epsilon = 1, sigma = 1 for atom type 1
+pair_coeff 2 2 0.5 3.0 # epsilon = 0.5, sigma = 3 for atom type 2
+
+# 4) Visualization
+thermo 10 # print thermo output every 10 steps
+thermo_style custom step temp pe ke etotal press # print step, temperature, potential energy, kinetic energy, total energy, pressure
+
+dump mydmp all atom 10 dump.min.lammpstrj # dump atom coordinates every 10 steps
+
+# 5) Run
+minimize 1.0e-4 1.0e-6 1000 10000 # minimize the system with 1.0e-4 force tolerance,
+                                  # 1.0e-6 energy tolerance, 1000 max iterations, 10000 max evals
+write_data minimized_coordinate.data # write minimized coordinates to file
