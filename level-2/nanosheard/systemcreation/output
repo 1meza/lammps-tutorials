@@ -1,31 +1,12 @@
+srun --cpu-bind=cores --module mpich shifter lmp -in input.lammps
 LAMMPS (2 Aug 2023)
   using 1 OpenMP thread(s) per MPI task
-boundary p p f
-units real
-atom_style full
-bond_style harmonic
-angle_style harmonic
-pair_style lj/cut/tip4p/long 1 2 1 1 0.1546 12.0
-kspace_style pppm/tip4p 1.0e-4
-kspace_modify slab 3.0
-
-lattice fcc 4.04
 Lattice spacing in x,y,z = 4.04 4.04 4.04
-region box block -3 3 -3 3 -5 5
-create_box 5 box bond/types 1 angle/types 1 extra/bond/per/atom 2 extra/angle/per/atom 1 extra/special/per/atom 2
 Created orthogonal box = (-12.12 -12.12 -20.2) to (12.12 12.12 20.2)
   4 by 4 by 8 MPI processor grid
-
-region rbotwall block -3 3 -3 3 -4 -3
-region rtopwall block -3 3 -3 3 3 4
-region rwall union 2 rbotwall rtopwall
-create_atoms 5 region rwall
 Created 432 atoms
   using lattice units in orthogonal box = (-12.12 -12.12 -20.2) to (12.12 12.12 20.2)
   create_atoms CPU = 0.003 seconds
-
-region rliquid block INF INF INF INF -2 2
-molecule h2omol RigidH2O.txt
 Read molecule template h2omol:
   1 molecules
   0 fragments
@@ -34,75 +15,33 @@ Read molecule template h2omol:
   1 angles with max type 1
   0 dihedrals with max type 0
   0 impropers with max type 0
-create_atoms 0 region rliquid mol h2omol 482793
 Created 1944 atoms
   using lattice units in orthogonal box = (-12.12 -12.12 -20.2) to (12.12 12.12 20.2)
   create_atoms CPU = 0.002 seconds
-
-create_atoms 3 random 15 52802 rliquid overlap 0.3 maxtry 500
 Created 15 atoms
   using lattice units in orthogonal box = (-12.12 -12.12 -20.2) to (12.12 12.12 20.2)
   create_atoms CPU = 0.001 seconds
-create_atoms 4 random 15 90182 rliquid overlap 0.3 maxtry 500
 Created 15 atoms
   using lattice units in orthogonal box = (-12.12 -12.12 -20.2) to (12.12 12.12 20.2)
   create_atoms CPU = 0.001 seconds
-set type 3 charge 1
 Setting atom values ...
   15 settings made for charge
-set type 4 charge -1
 Setting atom values ...
   15 settings made for charge
-
-include ../PARM.lammps
-mass 1 15.9994 # water
-mass 2 1.008 # water
-mass 3 28.990 # ion
-mass 4 35.453 # ion
-mass 5 26.9815 # wall
-
-pair_coeff 1 1 0.185199 3.1589 # water
-pair_coeff 2 2 0.0 1.0 # water
-pair_coeff 3 3 0.04690 2.4299 # ion
-pair_coeff 4 4 0.1500 4.04470 # ion
-pair_coeff 5 5 11.697 2.574 # wall
-pair_coeff 1 5 0.4 2.86645 # water-wall
-
-bond_coeff 1 0 0.9572 # water
-
-angle_coeff 1 0 104.52 # water
-include ../GROUP.lammps
-group H2O type 1 2
 1944 atoms in group H2O
-group Na type 3
 15 atoms in group Na
-group Cl type 4
 15 atoms in group Cl
-group ions union Na Cl
 30 atoms in group ions
-group fluid union H2O ions
 1974 atoms in group fluid
-
-group wall type 5
 432 atoms in group wall
-region rtop block INF INF INF INF 0 INF
-region rbot block INF INF INF INF INF 0
-group top region rtop
 1211 atoms in group top
-group bot region rbot
 1195 atoms in group bot
-group walltop intersect wall top
 216 atoms in group walltop
-group wallbot intersect wall bot
 216 atoms in group wallbot
-
-delete_atoms random fraction 0.15 yes H2O NULL 482793 mol yes
 WARNING: Ignoring 'compress yes' for molecular system (src/delete_atoms.cpp:140)
 Deleted 780 atoms, new total = 1626
 Deleted 520 bonds, new total = 776
 Deleted 260 angles, new total = 388
-
-run 0
 WARNING: No fixes with time integration, atoms won't move (src/verlet.cpp:60)
 PPPM initialization ...
   extracting TIP4P info from pair style
@@ -129,6 +68,10 @@ Neighbor list info ...
       pair build: half/bin/newton
       stencil: half/bin/3d
       bin: standard
+Setting up Verlet run ...
+  Unit style    : real
+  Current step  : 0
+  Time step     : 1
 Per MPI rank memory allocation (min/avg/max) = 7.291 | 7.461 | 7.65 Mbytes
    Step          Temp          E_pair         E_mol          TotEng         Press     
          0   0              880679.82      0              880679.82      10551872     
@@ -160,8 +103,6 @@ Ave neighs/atom = 475.31427
 Ave special neighs/atom = 1.4317343
 Neighbor list builds = 0
 Dangerous builds = 0
-
-write_data system.data nocoeff
 System init for write_data ...
 PPPM initialization ...
   extracting TIP4P info from pair style
@@ -174,5 +115,4 @@ PPPM initialization ...
   using double precision FFTW3
   3d grid and FFT values/proc = 3100 252
 Generated 9 of 10 mixed pair_coeff terms from geometric mixing rule
-write_dump all atom dump.lammpstrj
 Total wall time: 0:00:00
